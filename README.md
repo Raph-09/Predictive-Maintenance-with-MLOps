@@ -1,188 +1,174 @@
+
+
 # 📘 Project Documentation: Predictive Maintenance with MLOps
+
+## **0. Purpose of the Application**
+
+The purpose of this application is to build a **predictive maintenance system** capable of forecasting machine failures before they occur. It implements a full **MLOps pipeline** to ensure that data processing, model development, deployment, monitoring, and automation are performed in a scalable, reproducible, and production-ready manner. The system supports continuous integration, versioning, containerization, cloud deployment, and real-time monitoring of model performance.
+
+---
 
 ## **1. Data Ingestion**
 
-**Objective:** Collect raw data from MySQL database and store it in a structured format for downstream tasks.
+**Objective:** Acquire raw machine operating data from a MySQL database and convert it into a clean, structured format suitable for preprocessing and modeling.
 
-* **Process:**
+**Highlights:**
 
-  * Connects to **MySQL** using `sqlalchemy` and `mysql-connector`.
-  * Loads data into **Pandas DataFrame**.
-  * Saves processed data into a CSV file.
+* Connects to a MySQL database.
+* Loads raw data into a tabular structure.
+* Saves the ingested data into a CSV format for versioning and reuse.
+* Integrated logging and exception handling to ensure reliability.
 
-* **Key Components:**
-
-  * `DataIngestion` class in `Data_ingestion.py`.
-  * Logging with `logger.py`.
-  * Exception handling with `exception.py`.
-
-* **Tools:**
-
-  * **MySQL** (Data Source)
-  * **SQLAlchemy + mysql-connector** (Database connection)
-  * **Pandas** (Data handling)
+**Tools Used:**
+MySQL, SQLAlchemy, MySQL-connector, Pandas.
 
 ---
 
 ## **2. Data Transformation**
 
-**Objective:** Clean, preprocess, and prepare the dataset for model training.
+**Objective:** Prepare and enhance the dataset to improve model performance during training.
 
-* **Steps:**
+**Main Steps:**
 
-  1. **Feature Engineering:** Create new feature `Power = Torque × Rotational speed`.
-  2. **Irrelevant Feature Removal:** Drop identifiers and redundant features.
-  3. **Outlier Handling:** Apply IQR method to remove outliers.
-  4. **Encoding:** Label encode categorical variables.
-  5. **Variable Splitting:** Define independent variables (X) and target (y).
-  6. **Data Balancing:** Apply **SMOTE** for handling imbalanced dataset.
-  7. **Train-Test Split:** Split into training (70%) and testing (30%).
+1. **Feature Engineering** – Creates a new calculated feature:
+   *Power = Torque × Rotational Speed*
+2. **Feature Selection** – Removes redundant or irrelevant variables.
+3. **Outlier Removal** – Applies IQR-based filtering.
+4. **Encoding** – Converts categorical attributes into numerical format.
+5. **Variable Separation** – Defines features (X) and target (y).
+6. **Class Balancing** – Uses SMOTE to address class imbalance issues.
+7. **Data Splitting** – Divides data into 70% training and 30% testing sets.
 
-* **Key Components:**
-
-  * `DataTransformation` class in `Data_transformation.py`.
-
-* **Tools:**
-
-  * **Pandas** (Preprocessing)
-  * **scikit-learn** (Encoding, splitting)
-  * **imblearn (SMOTE)** (Balancing dataset)
+**Tools Used:**
+Pandas, Scikit-learn, Imbalanced-Learn (SMOTE).
 
 ---
 
 ## **3. Model Training**
 
-**Objective:** Train machine learning models on processed data.
+**Objective:** Train a machine learning model capable of predicting equipment failures accurately.
 
-* **Process:**
+**Details:**
 
-  * Uses **RandomForestClassifier** with tuned parameters.
-  * Trained model saved as `model.pickle`.
+* Utilizes **RandomForestClassifier** for robust performance.
+* Applies tuned hyperparameters.
+* Stores the final trained model in serialized format for deployment.
 
-* **Key Components:**
-
-  * `trainer` class in `Model_training.py`.
-
-* **Tools:**
-
-  * **scikit-learn (RandomForestClassifier)**
-  * **pickle** (Model persistence)
+**Tools Used:**
+Scikit-learn, Pickle.
 
 ---
 
 ## **4. Model Evaluation**
 
-**Objective:** Evaluate trained model performance using standard metrics.
+**Objective:** Assess model performance using standard classification metrics.
 
-* **Metrics:**
+**Metrics Evaluated:**
 
-  * Accuracy
-  * Precision
-  * Recall
-  * F1-Score
+* Accuracy
+* Precision
+* Recall
+* F1-Score
 
-* **Output:**
+All evaluation results are logged and stored for experiment tracking.
 
-  * Metrics logged.
-  * Saved in `metrics_report.txt`.
-
-* **Key Components:**
-
-  * `ModelEvaluation` class in `Model_evaluation.py`.
-
-* **Tools:**
-
-  * **scikit-learn.metrics**
+**Tools Used:**
+Scikit-learn (metrics).
 
 ---
 
 ## **5. Data & Model Versioning**
 
-**Objective:** Track and manage versions of data and models.
+**Objective:** Ensure reproducibility and traceability across datasets, model versions, and code.
 
-* **Tools Used:**
+**Tools Used:**
 
-  * **DVC (Data Version Control):** For dataset versioning.
-  * **Git:** For code versioning.
-  * **Dagshub:** Integrated for data, model, and code versioning.
+* **DVC** – Tracks datasets and intermediate artifacts.
+* **Git** – Version control for source code.
+* **Dagshub** – Centralized platform for managing code, data, models, and experiments.
 
 ---
 
 ## **6. Experiment Tracking**
 
-**Objective:** Track experiments, parameters, and metrics.
+**Objective:** Log and manage model training experiments, parameters, metrics, and artifacts.
 
-* **Tools Used:**
+**Tools Used:**
 
-  * **MLflow (Local + Dagshub integration):**
+* **MLflow** integrated with Dagshub:
 
-    * Logs model parameters, metrics, and artifacts.
-    * Used for model registration and tracking experiments.
+  * Tracks model parameters and metrics.
+  * Stores artifacts such as evaluation reports.
+  * Manages model registry for versioning.
 
 ---
 
 ## **7. Model Deployment**
 
-**Objective:** Deploy the trained model as a service.
+**Objective:** Deploy the trained model as a cloud-based service for real-world usage.
 
-* **Steps:**
+**Deployment Workflow:**
 
-  1. **Containerization:**
+1. **Containerization:**
+   The entire application is containerized using Docker.
 
-     * Dockerized using `Dockerfile`.
-     * Exposed on port 5000.
-  2. **Deployment:**
+2. **Cloud Deployment:**
+   The Docker image is pushed to **Azure Container Registry** and deployed via **Azure Web App**.
 
-     * Docker image pushed to **Azure Container Registry**.
-     * Deployed using **Azure Web App**.
-  3. **CI/CD:**
+3. **Continuous Integration / Continuous Deployment (CI/CD):**
+   GitHub Actions automates:
 
-     * **GitHub Actions** automates building, pushing, and deploying containers.
+   * Building Docker images
+   * Running tests
+   * Pushing images to Azure
+   * Deploying the updated application
 
-* **Tools:**
-
-  * **Docker** (Containerization)
-  * **Azure Container Registry** (Image hosting)
-  * **Azure Web App** (Hosting web app)
-  * **GitHub Actions** (CI/CD automation)
+**Tools Used:**
+Docker, Azure Container Registry, Azure Web App, GitHub Actions.
 
 ---
 
 ## **8. Monitoring**
 
-**Objective:** Ensure deployed model is performing reliably and detect drift.
+**Objective:** Continuously observe model performance and detect drift after deployment.
 
-* **Process:**
+**Monitoring Workflow:**
 
-  * Model predictions stored back in **MySQL database**.
-  * **EvidentlyAI** used for drift detection and monitoring.
+* Predictions generated by the model are logged in a MySQL database.
+* **EvidentlyAI** is used to detect:
 
-* **Tools:**
+  * Data drift
+  * Concept drift
+  * Performance degradation
 
-  * **MySQL** (Storage for monitoring results)
-  * **EvidentlyAI** (Model monitoring & drift detection)
+This enables proactive retraining and maintenance of the ML pipeline.
+
+**Tools Used:**
+MySQL, EvidentlyAI.
 
 ---
 
 ## **9. Testing & Automation**
 
-* **Pytest:** Unit tests to verify artifacts (e.g., model existence).
-* **GitHub Actions CI/CD:** Automated testing, building, and deployment.
+**Objective:** Ensure reliability, code quality, and automated workflow execution.
+
+**Components:**
+
+* **Pytest** – Unit tests to verify presence and correctness of artifacts such as trained models.
+* **GitHub Actions** – Automates testing, building, and deployment steps.
 
 ---
 
-# 📊 End-to-End Workflow
+# 📊 End-to-End Workflow Summary
 
-1. **Data Source:** MySQL → CSV.
-2. **Data Transformation:** Cleaning, feature engineering, balancing.
-3. **Training:** RandomForest model.
-4. **Evaluation:** Accuracy, Precision, Recall, F1.
-5. **Versioning & Tracking:** DVC, Git, Dagshub, MLflow.
-6. **Deployment:** Docker + Azure Web App via GitHub Actions.
-7. **Monitoring:** EvidentlyAI + MySQL logging.
+1. **Data Ingestion:** Collect data from MySQL and save as CSV.
+2. **Data Transformation:** Clean, engineer features, balance classes, and split data.
+3. **Model Training:** Train RandomForest model and save it.
+4. **Evaluation:** Compute classification metrics.
+5. **Versioning & Tracking:** Use Git, DVC, Dagshub, and MLflow.
+6. **Deployment:** Containerize and deploy to Azure using CI/CD.
+7. **Monitoring:** Detect drift using EvidentlyAI with results stored in MySQL.
 
 ---
 
-✅ This setup ensures **reproducibility, automation, scalability, and monitoring** across the full ML lifecycle.
-
-
+✅ This end-to-end MLOps pipeline ensures **automation, transparency, reproducibility, scalability, and continuous monitoring** of the predictive maintenance system.
